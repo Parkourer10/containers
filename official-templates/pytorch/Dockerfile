@@ -7,7 +7,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV SHELL=/bin/bash
 
-# Set the working directory
+# Set the working director
 WORKDIR /
 
 # Create workspace directory
