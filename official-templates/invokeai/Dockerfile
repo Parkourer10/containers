@@ -11,7 +11,7 @@ RUN python -m venv /workspace/invokeai/venv
 ENV PATH="/workspace/invokeai/venv/bin:$PATH"
 
 WORKDIR /workspace/invokeai
-
+#e
 RUN python -m pip install --upgrade pip && \
     pip install "InvokeAI[xformers]" --use-pep517 --extra-index-url https://download.pytorch.org/whl/cu117 && \
     pip install pypatchmatch
