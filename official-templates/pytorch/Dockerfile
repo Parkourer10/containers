@@ -8,8 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV SHELL=/bin/bash
 
 WORKDIR /
-
-# Create workspace directory
+ 
 RUN mkdir /workspace
 
 # System packages
