@@ -3,7 +3,7 @@ FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Set environment variables
+# Set environment variablesee
 ENV DEBIAN_FRONTEND=noninteractive
 ENV SHELL=/bin/bash
 
