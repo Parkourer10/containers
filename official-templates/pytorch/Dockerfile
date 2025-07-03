@@ -1,8 +1,5 @@
-ARG BASE_IMAGE=non-existing
-FROM ${BASE_IMAGE}
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
 
-ARG TORCH
-ARG PYTHON_VERSION
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -16,36 +13,33 @@ WORKDIR /
 # Create workspace directory
 RUN mkdir /workspace
 
-# Update, upgrade, install packages, install python if PYTHON_VERSION is specified, clean up
-RUN apt-get update --yes && \
-    apt-get upgrade --yes && \
-    apt install --yes --no-install-recommends git wget curl bash libgl1 software-properties-common openssh-server nginx && \
-    if [ -n "${PYTHON_VERSION}" ]; then \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt install "python${PYTHON_VERSION}-dev" "python${PYTHON_VERSION}-venv" -y --no-install-recommends; \
-    fi && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+# System packages
+RUN apt update && apt install -y software-properties-common \
+ && add-apt-repository ppa:deadsnakes/ppa \
+ && apt update && apt install -y \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3-pip \
+    git \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    gcc \
+    make \
+    curl \
+    wget \
+    openjdk-8-jdk \
+    tzdata \
+    openssh-server
 
-# Set up Python and pip only if PYTHON_VERSION is specified
-RUN if [ -n "${PYTHON_VERSION}" ]; then \
-    ln -s /usr/bin/python${PYTHON_VERSION} /usr/bin/python && \
-    rm /usr/bin/python3 && \
-    ln -s /usr/bin/python${PYTHON_VERSION} /usr/bin/python3 && \
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python get-pip.py; \
-    fi
+# Python packages
+RUN pip3 install --upgrade pip
+RUN pip3 install opencv-python gym3 attrs \
+ && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
-
-RUN pip install --upgrade --no-cache-dir pip
-# Install PyTorch only if TORCH is specified
-RUN if [ -n "${TORCH}" ]; then pip install --upgrade --no-cache-dir ${TORCH}; fi 
-RUN pip install --upgrade --no-cache-dir jupyterlab ipywidgets jupyter-archive 
-
-# Set up Jupyter Notebook
-RUN pip install notebook==7.3.3
+# Optional: Install Jupyter
+RUN pip install jupyterlab notebook ipywidgets
 
 # Remove existing SSH host keys
 RUN rm -f /etc/ssh/ssh_host_*
